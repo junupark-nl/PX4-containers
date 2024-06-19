@@ -10,7 +10,10 @@ ENV ROS_DISTRO noetic
 
 # install PCL-C++
 RUN apt-get update \
-    && apt-get install -y libeigen3-dev libpcl-dev
+    && apt-get install -y libpcl-dev \
+	&& apt-get -y autoremove \
+	&& apt-get clean autoclean \
+	&& rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
     
 # build and install ceres-solver from source
 RUN apt-get install -y libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev \
@@ -45,7 +48,7 @@ RUN mkdir -p ~/catkin_ws/src \
     && cd ~/catkin_ws/src \
     && git clone https://github.com/koide3/ndt_omp.git \
     && git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive 
-    # not to clone repos everytime building the image, separate here
+    # separate here not to clone repos everytime building the image (when failed)
 
 # Source the ROS setup script and build the workspace
 RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && cd ~/catkin_ws && catkin_make"
