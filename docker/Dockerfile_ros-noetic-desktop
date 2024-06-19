@@ -1,6 +1,4 @@
-#
-# PX4 ROS development environment
-#
+# IFS-specific retargeting of the px4-dev-ros-noetic Dockerfile
 
 FROM px4io/px4-dev-simulation-focal:latest
 
@@ -23,11 +21,19 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" 
 		python3-catkin-tools \
 		python3-catkin-lint \
 		ros-$ROS_DISTRO-gazebo-ros-pkgs \
+		ros-$ROS_DISTRO-geodesy \
+		ros-$ROS_DISTRO-image-geometry \
+		ros-$ROS_DISTRO-libg2o \
 		ros-$ROS_DISTRO-mavlink \
 		ros-$ROS_DISTRO-mavros \
 		ros-$ROS_DISTRO-mavros-extras \
+		ros-$ROS_DISTRO-mavros-msgs \
+		ros-$ROS_DISTRO-move-base-msgs \
+		ros-$ROS_DISTRO-nmea-msgs \
 		ros-$ROS_DISTRO-octomap \
+		ros-$ROS_DISTRO-octomap-ros \
 		ros-$ROS_DISTRO-octomap-msgs \
+		ros-$ROS_DISTRO-octomap-rviz-plugins \
 		ros-$ROS_DISTRO-pcl-conversions \
 		ros-$ROS_DISTRO-pcl-msgs \
 		ros-$ROS_DISTRO-pcl-ros \
@@ -51,3 +57,6 @@ RUN git clone https://github.com/dronecrew/px4tools.git /tmp/px4tools && \
 
 # bootstrap rosdep
 RUN rosdep init && rosdep update
+
+# build as
+# docker build -t vividlibra/px4-dev-ros-noetic-desktop -f Dockerfile_ros-noetic-desktop .

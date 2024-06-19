@@ -1,0 +1,67 @@
+# IFS-specific increment 
+
+FROM vividlibra/px4-dev-ros-noetic-desktop:latest
+
+USER root
+
+ENV ROS_DISTRO noetic
+
+# Eigen3, protobuf, opencv is already installed from simulation-focal
+
+# install PCL-C++
+RUN apt-get update \
+    && apt-get install -y libeigen3-dev libpcl-dev
+    
+# build and install ceres-solver from source
+RUN apt-get install -y libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev \
+    && mkdir -p ~/temporary \
+    && cd ~/temporary \
+    && git clone https://ceres-solver.googlesource.com/ceres-solver \
+    && cd ceres-solver \
+    # && git checkout $(git describe --tags) \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && make -j3 \
+    && make install \
+    && cd ../.. \
+    && rm -rf ceres-solver
+
+# build and install g2o from source
+RUN cd ~/temporary \ 
+    && git clone https://github.com/RainerKuemmerle/g2o.git \
+    && cd g2o \
+    # && git checkout $(git describe --tags) \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && make -j4 \
+    && make install \
+    && cd ../.. \
+    && rm -rf g2o
+
+# misc
+RUN mkdir -p ~/catkin_ws/src \
+    && cd ~/catkin_ws/src \
+    && git clone https://github.com/koide3/ndt_omp.git \
+    && git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive 
+    # not to clone repos everytime building the image, separate here
+
+# Source the ROS setup script and build the workspace
+RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && cd ~/catkin_ws && catkin_make"
+
+# setup geographiclib
+RUN cd ~/temporary \
+    && mkdir -p scripts \
+    && cd scripts \
+    && wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh \
+    && chmod +x install_geographiclib_datasets.sh \
+    && ./install_geographiclib_datasets.sh \
+    && cd ~ \
+    && rm -rf temporary
+
+# bootstrap rosdep
+RUN rosdep update
+
+# build as
+# docker build -t vividlibra/px4-dev-ros-noetic-desktop-ifs -f Dockerfile_ros-noetic-desktop-ifs .
