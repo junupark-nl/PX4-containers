@@ -2,8 +2,10 @@
 # PX4 Gazebo 11 development environment in Ubuntu 20.04 Focal
 #
 
-FROM px4io/px4-dev-base-focal:2024-05-18
-LABEL maintainer="Nuno Marques <nuno.marques@dronesolutions.io>"
+# FROM px4io/px4-dev-base-focal:2024-05-18
+# LABEL maintainer="Nuno Marques <nuno.marques@dronesolutions.io>"
+
+FROM vividlibra/focal-px4:latest
 
 RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
 	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
@@ -33,11 +35,15 @@ RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pk
 	&& rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
 
 # Some QT-Apps/Gazebo don't not show controls without this
-ENV QT_X11_NO_MITSHM 1
+ENV QT_X11_NO_MITSHM=1
 
 # Use UTF8 encoding in java tools (needed to compile jMAVSim)
 ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8
 
+# jwpark: we don't need JSBSIM
 # Install JSBSim
-RUN wget https://github.com/JSBSim-Team/jsbsim/releases/download/v1.1.1a/JSBSim-devel_1.1.1-134.focal.amd64.deb
-RUN dpkg -i JSBSim-devel_1.1.1-134.focal.amd64.deb
+# RUN wget https://github.com/JSBSim-Team/jsbsim/releases/download/v1.1.1a/JSBSim-devel_1.1.1-134.focal.amd64.deb
+# RUN dpkg -i JSBSim-devel_1.1.1-134.focal.amd64.deb
+
+# build as
+# docker buildx build --platform linux/amd64,linux/arm64 -t vividlibra/focal-px4-simulation:latest -f Dockerfile_simulation-focal --push .

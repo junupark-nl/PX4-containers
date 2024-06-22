@@ -100,3 +100,6 @@ COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 CMD ["/bin/bash"]
+
+# build as
+# docker buildx build --platform linux/amd64,linux/arm64 -t vividlibra/focal-px4:latest -f Dockerfile_base-focal --push .
