@@ -10,7 +10,11 @@ ENV ROS_DISTRO=noetic
 
 # Eigen3, protobuf, opencv is already installed from simulation-focal
 
-# install PCL-C++
+# install vim for editing
+RUN apt-get update \
+    && apt-get install -y vim
+
+# install PCL-C++    
 RUN apt-get update \
     && apt-get install -y libpcl-dev \
 	&& apt-get -y autoremove \
@@ -23,20 +27,21 @@ RUN apt-get install -y libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev \
     && cd ~/temporary \
     && git clone https://ceres-solver.googlesource.com/ceres-solver \
     && cd ceres-solver \
-    # && git checkout $(git describe --tags) \
     && mkdir build \
     && cd build \
     && cmake .. \
     && make -j3 \
     && make install \
     && cd ../.. \
-    && rm -rf ceres-solver
+    && rm -rf ceres-solver \
+	&& apt-get -y autoremove \
+	&& apt-get clean autoclean \
+	&& rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
 
 # build and install g2o from source
 RUN cd ~/temporary \ 
     && git clone https://github.com/RainerKuemmerle/g2o.git \
     && cd g2o \
-    # && git checkout $(git describe --tags) \
     && mkdir build \
     && cd build \
     && cmake .. \
