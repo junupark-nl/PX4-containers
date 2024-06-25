@@ -1,4 +1,4 @@
-# IFS-specific increment 
+# IFS-specific increment
 
 # FROM vividlibra/px4-dev-ros-noetic-desktop:latest
 
@@ -14,13 +14,13 @@ ENV ROS_DISTRO=noetic
 RUN apt-get update \
     && apt-get install -y vim
 
-# install PCL-C++    
+# install PCL-C++
 RUN apt-get update \
     && apt-get install -y libpcl-dev \
 	&& apt-get -y autoremove \
 	&& apt-get clean autoclean \
 	&& rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
-    
+
 # build and install ceres-solver from source
 RUN apt-get install -y libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev \
     && mkdir -p ~/temporary \
@@ -39,7 +39,7 @@ RUN apt-get install -y libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev \
 	&& rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
 
 # build and install g2o from source
-RUN cd ~/temporary \ 
+RUN cd ~/temporary \
     && git clone https://github.com/RainerKuemmerle/g2o.git \
     && cd g2o \
     && mkdir build \
@@ -54,7 +54,7 @@ RUN cd ~/temporary \
 RUN mkdir -p ~/catkin_ws/src \
     && cd ~/catkin_ws/src \
     && git clone https://github.com/koide3/ndt_omp.git \
-    && git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive 
+    && git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
 
 # Modify CMakeLists.txt if building for ARM architecture
 # jwpark: This is a temporary workaround for the ARM architecture, https://github.com/koide3/ndt_omp/issues/15
@@ -80,6 +80,6 @@ RUN rosdep update
 
 # you should do both
 # using x86_64 machine:
-# docker buildx build --platform linux/amd64 -t vividlibra/focal-px4-noetic-desktop-ifs:latest -f Dockerfile_ros-noetic-desktop-ifs --push .
+# docker buildx build --platform linux/amd64 -t vividlibra/focal-px4-noetic-desktop-ifs:amd64 -f Dockerfile_ros-noetic-desktop-ifs --push .
 # using arm64 machine:
-# docker buildx build --platform linux/arm64 -t vividlibra/focal-px4-noetic-desktop-ifs:latest -f Dockerfile_ros-noetic-desktop-ifs --push .
+# docker buildx build --platform linux/arm64 -t vividlibra/focal-px4-noetic-desktop-ifs:arm64 -f Dockerfile_ros-noetic-desktop-ifs --push .
