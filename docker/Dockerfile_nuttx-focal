@@ -2,8 +2,10 @@
 # PX4 NuttX development environment in Ubuntu 20.04 Focal
 #
 
-FROM px4io/px4-dev-base-focal:2024-05-18
-LABEL maintainer="Daniel Agar <daniel@agar.ca>"
+# FROM px4io/px4-dev-base-focal:2024-05-18
+# LABEL maintainer="Daniel Agar <daniel@agar.ca>"
+
+FROM vividlibra/focal-px4:latest
 
 RUN apt-get update \
 	&& DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
@@ -47,3 +49,6 @@ RUN git clone --depth 1 https://bitbucket.org/nuttx/tools.git /tmp/tools \
 RUN git clone --recursive https://github.com/google/bloaty.git /tmp/bloaty \
 	&& cd /tmp/bloaty && cmake -GNinja . && ninja -j $(nproc) bloaty && cp bloaty /usr/local/bin/ \
 	&& rm -rf /tmp/*
+
+# build as
+# docker buildx build --platform linux/amd64,linux/arm64 -t vividlibra/focal-px4-nuttx:latest -f Dockerfile_nuttx-focal --push .
