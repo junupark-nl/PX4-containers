@@ -50,5 +50,23 @@ RUN git clone --recursive https://github.com/google/bloaty.git /tmp/bloaty \
 	&& cd /tmp/bloaty && cmake -GNinja . && ninja -j $(nproc) bloaty && cp bloaty /usr/local/bin/ \
 	&& rm -rf /tmp/*
 
+# jwpark: added for ARM build, which I suppose to be not good but it works.
+RUN ARCH=$(uname -m) \
+	&& if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
+		apt-get update && apt-get install -y \
+		gcc-arm-none-eabi \
+		libxml2-dev \
+		libxslt1-dev \
+		zlib1g-dev \
+		build-essential \
+		binutils-arm-none-eabi; \
+		pip3 install lxml \
+		&& git clone https://github.com/PX4/NuttX.git /src/NuttX \
+		&& cd /src/NuttX/tools \
+		&& make --no-print-directory gencromfs \
+		&& cp /src/NuttX/tools/gencromfs /usr/local/bin/; \
+	fi \
+	&& rm -rf /var/lib/apt/lists/*
+
 # build as
 # docker buildx build --platform linux/amd64,linux/arm64 -t vividlibra/focal-px4-nuttx:latest -f Dockerfile_nuttx-focal --push .
