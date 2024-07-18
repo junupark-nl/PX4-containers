@@ -28,6 +28,7 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" 
 		python3-wstool \
 		ros-$ROS_DISTRO-gazebo-ros-pkgs \
 		ros-$ROS_DISTRO-geodesy \
+		ros-$ROS_DISTRO-geometry2 \
 		ros-$ROS_DISTRO-hector-gazebo-plugins \
 		ros-$ROS_DISTRO-image-geometry \
 		ros-$ROS_DISTRO-libg2o \

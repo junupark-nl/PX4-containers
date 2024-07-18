@@ -22,24 +22,26 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
 
 # build and install ceres-solver from source
-RUN apt-get install -y libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev \
-    && mkdir -p ~/temporary \
-    && cd ~/temporary \
-    && git clone https://ceres-solver.googlesource.com/ceres-solver \
-    && cd ceres-solver \
-    && mkdir build \
-    && cd build \
-    && cmake .. \
+RUN apt-get install -y libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev
+
+COPY ./ceres-solver-2.2.0.tar.gz /tmp/ceres-solver-2.2.0.tar.gz
+RUN cd /tmp \
+    && tar zxf ceres-solver-2.2.0.tar.gz \
+    && mkdir ceres-bin \
+    && cd ceres-bin \
+    && cmake ../ceres-solver-2.2.0 \
     && make -j3 \
+    && make test \
     && make install \
-    && cd ../.. \
-    && rm -rf ceres-solver \
+    && cd /tmp \
+    && rm -rf ceres* \
 	&& apt-get -y autoremove \
 	&& apt-get clean autoclean \
 	&& rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
 
 # build and install g2o from source
-RUN cd ~/temporary \
+RUN mkdir -p ~/temporary \ 
+    && cd ~/temporary \
     && git clone https://github.com/RainerKuemmerle/g2o.git \
     && cd g2o \
     && mkdir build \
@@ -50,20 +52,21 @@ RUN cd ~/temporary \
     && cd ../.. \
     && rm -rf g2o
 
-# misc
-RUN mkdir -p ~/catkin_ws/src \
-    && cd ~/catkin_ws/src \
-    && git clone https://github.com/koide3/ndt_omp.git \
-    && git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
+# We don't need these as build dependencies are resolved, they are all independent
+# # misc
+# RUN mkdir -p ~/catkin_ws/src \
+#     && cd ~/catkin_ws/src \
+#     && git clone https://github.com/koide3/ndt_omp.git \
+#     && git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
 
-# Modify CMakeLists.txt if building for ARM architecture
-# jwpark: This is a temporary workaround for the ARM architecture, https://github.com/koide3/ndt_omp/issues/15
-RUN if [ "$(uname -m)" = "aarch64" ]; then \
-        sed -i '10,11d' ~/catkin_ws/src/ndt_omp/CMakeLists.txt; \
-    fi
+# # Modify CMakeLists.txt if building for ARM architecture
+# # jwpark: This is a temporary workaround for the ARM architecture, https://github.com/koide3/ndt_omp/issues/15
+# RUN if [ "$(uname -m)" = "aarch64" ]; then \
+#         sed -i '10,11d' ~/catkin_ws/src/ndt_omp/CMakeLists.txt; \
+#     fi
 
-# Source the ROS setup script and build the workspace
-RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && cd ~/catkin_ws && catkin_make"
+# # Source the ROS setup script and build the workspace
+# RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && cd ~/catkin_ws && catkin_make"
 
 # setup geographiclib
 RUN cd ~/temporary \
